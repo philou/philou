@@ -1,0 +1,18 @@
+<% content_for('body') do %>
+
+   <%= view :boardView, 
+       	    :tag => :table, 
+	    :view => 'Tetris.BoardView',
+	    :bind => { :game => 'Tetris.gameController.game',
+	    	       :boardTime => 'Tetris.gameController.game.boardTime' } %>
+
+   <%= button_view :label => 'start', :action => 'Tetris.gameController.game.start' %>
+   <%= button_view :label => 'stop', :action => 'Tetris.gameController.game.stop' %>
+   <p/>
+   playing: <%= label_view :playing, :bind => {:value => 'Tetris.gameController.game.playing' } %>
+   <p/>
+   lines : <%= label_view :lineCount, :bind => {:value => 'Tetris.gameController.game.lineCount' } %> 
+
+<% end %>
+
+	    

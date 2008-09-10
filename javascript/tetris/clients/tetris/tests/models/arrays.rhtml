@@ -1,0 +1,59 @@
+<% # ========================================================================
+   # Tetris.Arrays Unit Test
+   # ========================================================================
+%>
+<% content_for('final') do %>
+
+<script>
+
+Test.context("Tetris.Arrays",{
+
+    setup: function() {
+	this.assertIdenticalArraysEx = function(array1, array2, assertIdenticalItems) {
+	    this.assertIdentical(Boolean(array1), Boolean(array2));
+	    this.assertIdentical(array1.length, array2.length);
+	    for(var i = 0; i < array1.length; i++) {
+		assertIdenticalItems(array1[i], array2[i]);
+	    }
+	};
+	this.assertIdenticalArrays = function(array1, array2) {
+	    var that = this;
+	    this.assertIdenticalArraysEx(array1, array2, function(item1, item2) {
+		that.assertIdentical(item1, item2);
+	    });
+	};
+	this.assertIdenticalArraysOfArrays = function(array1, array2) {
+	    var that = this;
+	    this.assertIdenticalArraysEx(array1, array2, function(item1, item2) {
+		that.assertIdenticalArrays(item1, item2);
+	    });
+	};
+
+	// TODO try to extend array prototype class with shouldEqual ...
+	// look out how to use default argument values in functions
+    },
+
+    "Constant array samples": function() {
+	assertIdenticalArrays([2,2,2], Tetris.Arrays.constant(3, 2));
+
+	assertIdenticalArrays([], Tetris.Arrays.constant(0, 2));
+    },
+
+    "Range samples": function() {
+	assertIdenticalArrays([2,3,4], Tetris.Arrays.range(2, 4));
+	assertIdenticalArrays([2], Tetris.Arrays.range(2, 2));
+	assertIdenticalArrays([], Tetris.Arrays.range(4, 2));
+    },
+
+    "Zip samples": function() {
+	assertIdenticalArraysOfArrays([[2,3],[4,5]], Tetris.Arrays.zip([2,4],[3,5]));
+	assertIdenticalArraysOfArrays([[2,3]], Tetris.Arrays.zip([2,4],[3]));
+    },
+
+}) ;
+
+if (window.main && (appMain = main)) main = null ;
+
+</script>
+
+<% end %>

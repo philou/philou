@@ -1,0 +1,168 @@
+    <% # ========================================================================
+    # Tetris.Piece Unit Test
+# ========================================================================
+    %>
+    <% content_for('final') do %>
+
+    <script>
+
+Test.context("Tetris.Piece",{
+
+    setup: function() {
+	var that = this;
+
+	this.sizeOf = function(iterable) {
+	    var result = 0;
+	    iterable.each(function() {
+		result++;
+	    });
+	    return result;
+	};
+
+	this.assertPieceSizeConstant = function(piece) {
+	    var size = that.sizeOf(piece);
+
+	    function moveAndAssertSizeNTimes(n, move) {
+		Tetris.Helper.times(n, function() {
+		    piece = move(piece);
+		    that.assertIdentical(size, that.sizeOf(piece));
+		});
+	    };
+
+	    moveAndAssertSizeNTimes(10, function(piece) { return piece.left(); });
+	    moveAndAssertSizeNTimes( 3, function(piece) { return piece.rotate(); });
+	    moveAndAssertSizeNTimes(20, function(piece) { return piece.down(); });
+	    moveAndAssertSizeNTimes( 3, function(piece) { return piece.rotate(); });
+	    moveAndAssertSizeNTimes(20, function(piece) { return piece.right(); });
+	    moveAndAssertSizeNTimes( 3, function(piece) { return piece.rotate(); });
+	};
+
+	this.assertContainsEach = function(piece) {
+	    piece.each(function(row, col) {
+		that.assertIdentical(true, piece.contains(row, col));
+	    });
+	};
+
+	this.assertPieceIs = function(content, piece, message) {
+	    message = message || "";
+
+	    that.assertIdentical(content.length, that.sizeOf(piece), message + "size of piece");
+	    content.each(function(row_col) {
+		that.assertIdentical(true, piece.contains(row_col[0], row_col[1]), message + "contains row: " + row_col[0] + ", col: " + row_col[1]);
+	    });
+	};
+
+	this.assertPieceMoves = function(pieceFactory, contents) {
+
+	    var piece = pieceFactory.create();
+	    this.assertPieceIs(contents.initial, piece, "initial, ");
+
+	    piece = piece.left();
+	    this.assertPieceIs(contents.movedLeft, piece, "moved left, ");
+
+	    piece = piece.right();
+	    this.assertPieceIs(contents.initial, piece, "moved left then right, ");
+
+	    piece = piece.rotate();
+	    this.assertPieceIs(contents.rotated, piece, "rotated, ");
+
+	    Tetris.Helper.times(3, function() { piece = piece.rotate(); });
+	    this.assertPieceIs(contents.initial, piece, "rotated 4 times, ");
+
+	    piece = piece.down();
+	    this.assertPieceIs(contents.movedDown, piece, "moved Down, ");
+	};
+
+	this.pieces = [Tetris.Piece.create(), Tetris.SquarePiece.create(), Tetris.IPiece.create(), Tetris.LPiece.create(), Tetris.InvertedLPiece.create(), Tetris.StepPiece.create(), Tetris.InvertedStepPiece.create()];
+    },
+    
+    teardown: function() {
+	delete this.pieces;
+    },
+
+    "Wherever moved, the size of the piece should stay the same": function() {
+	var that = this;
+	
+	this.pieces.each(function(piece) {
+	    that.assertPieceSizeConstant(piece);
+	});
+    },
+
+    "A piece should contain each of its cells": function() {
+	var that = this;
+	
+	this.pieces.each(function(piece) {
+	    that.assertContainsEach(piece);
+	});
+    },
+
+    "Square piece basic moves": function() {
+	this.assertPieceMoves(Tetris.SquarePiece, {
+	    initial: [[0,3],[0,4],[1,3],[1,4]],
+	    movedLeft: [[0,2],[0,3],[1,2],[1,3]],
+	    movedDown: [[1,3],[2,4],[2,3],[2,4]],
+	    rotated: [[0,3],[0,4],[1,3],[1,4]]
+	});
+    },
+
+    "I piece basic moves": function() {
+	this.assertPieceMoves(Tetris.IPiece, {
+	    initial: [[0,3],[1,3],[2,3],[3,3]],
+	    movedLeft: [[0,2],[1,2],[2,2],[3,2]],
+	    movedDown: [[1,3],[2,3],[3,3],[4,3]],
+	    rotated: [[2,1],[2,2],[2,3],[2,4]]
+	});
+    },
+
+    "T piece basic moves": function() {
+	this.assertPieceMoves(Tetris.TPiece, {
+	    initial: [[0,2],[0,3],[0,4],[1,3]],
+	    movedLeft: [[0,1],[0,2],[0,3],[1,2]],
+	    movedDown: [[1,2],[1,3],[1,4],[2,3]],
+	    rotated: [[-1,3],[0,3],[1,3],[0,2]]
+	});
+    },
+
+    "L piece basic moves": function() {
+	this.assertPieceMoves(Tetris.LPiece, {
+	    initial: [[0,2],[0,3],[0,4],[1,2]],
+	    movedLeft: [[0,1],[0,2],[0,3],[1,1]],
+	    movedDown: [[1,2],[1,3],[1,4],[2,2]],
+	    rotated: [[-1,3],[0,3],[1,3],[-1,2]]
+	});
+    },
+
+    "Inverted L piece basic moves": function() {
+	this.assertPieceMoves(Tetris.InvertedLPiece, {
+	    initial: [[0,2],[0,3],[0,4],[1,4]],
+	    movedLeft: [[0,1],[0,2],[0,3],[1,3]],
+	    movedDown: [[1,2],[1,3],[1,4],[2,4]],
+	    rotated: [[-1,3],[0,3],[1,3],[1,2]]
+	});
+    },
+
+    "Step piece basic moves": function() {
+	this.assertPieceMoves(Tetris.StepPiece, {
+	    initial: [[1,2],[1,3],[0,3],[0,4]],
+	    movedLeft: [[1,1],[1,2],[0,2],[0,3]],
+	    movedDown: [[2,2],[2,3],[1,3],[1,4]],
+	    rotated: [[0,3],[1,3],[1,4],[2,4]]
+	});
+    },
+
+    "Inverted step piece basic moves": function() {
+	this.assertPieceMoves(Tetris.InvertedStepPiece, {
+	    initial: [[0,2],[0,3],[1,3],[1,4]],
+	    movedLeft: [[0,1],[0,2],[1,2],[1,3]],
+	    movedDown: [[1,2],[1,3],[2,3],[2,4]],
+	    rotated: [[0,4],[1,4],[1,3],[2,3]]
+	});
+    },
+
+}) ;
+
+if (window.main && (appMain = main)) main = null ;
+
+</script>
+
+    <% end %>

@@ -1,0 +1,269 @@
+    <% # ========================================================================
+    # Tetris.Game Unit Test
+# ========================================================================
+    %>
+    <% content_for('final') do %>
+
+    <script>
+
+Test.context("Tetris.Game", {
+
+    setup: function() {
+	
+	// helper functions
+	this.assertBoardEquals = function(game, filledCells) {
+	    for(r = 0; r < Tetris.Game.RowCount; r++) {
+		for(c = 0; c < Tetris.Game.ColCount; c++) {
+		    this.assertIdentical(filledCells.contains(r,c), game.cellStatus(r,c), "Cell at row:" + r + ", col:" + c);
+		}
+	    }
+	};
+	this.assertBoardEmpty = function(game) {
+	    this.assertBoardEquals(game, Tetris.CoordSet.create());
+	};
+
+	// test fixtures
+	this.ticker = {
+	    started: false,
+	    stoped: false,
+	    start: function(game) {
+		this.started = true;
+	    },
+	    stop: function(game) {
+		this.stoped = true;
+	    },
+	};
+	this.game = Tetris.Game.create( { ticker: this.ticker, pieceFactory: Tetris.Piece } );
+    },
+
+    teardown: function() {
+	delete this.game;
+	delete this.ticker;
+	delete this.pieceFactory;
+    },
+
+    "A game should be playing between start and stop": function() {
+	assertNotNull(this.game);
+	
+	assertIdentical( false, this.game.get('playing'), "A game should not be playing before started.");
+	this.game.start();
+	assertIdentical( true, this.game.get('playing'), "A game should be playing once started.");
+	this.game.stop();
+	assertIdentical( false, this.game.get('playing'), "A game should not be playing once stoped.");
+    },
+
+    "Before the game starts, the board should be empty": function() {
+	assertBoardEmpty(this.game);
+	this.game.start();
+    },
+
+    "The ticker should be notified about the game start and stop": function() {
+	assertIdentical(this.ticker, this.game.get('ticker'));
+	
+	assertIdentical( false, this.ticker.started);
+	this.game.start();
+	assertIdentical( true, this.ticker.started);
+
+	assertIdentical( false, this.ticker.stoped);
+	this.game.stop();
+	assertIdentical( true, this.ticker.stoped);
+    },
+
+    "Board time should be updated at tick": function() {
+	this.game.start();
+	var oldTime = this.game.get('boardTime');
+	this.game.tick();
+	var newTime = this.game.get('boardTime');
+	assertNotIdentical(oldTime, newTime);
+    },
+
+    "A piece should appear when the game starts": function() {
+	this.game.start();
+	assertBoardEquals(this.game, Tetris.CoordSet.createWith([[0,3]]));
+    },
+
+    "The piece should go down at each tick": function() {
+	this.game.start();
+	for(var i = 0; i < Tetris.Game.RowCount; i++) {
+	    assertBoardEquals(this.game, Tetris.CoordSet.createWith([[i, 3]]));
+	    this.game.tick();
+	}
+    },
+
+    "The piece should move with left, down and right" : function() {
+	this.game.start();
+
+	this.game.right();
+	assertBoardEquals(this.game, Tetris.CoordSet.createWith([[0,4]]));
+
+	this.game.down();
+	assertBoardEquals(this.game, Tetris.CoordSet.createWith([[1,4]]));
+
+	this.game.left();
+	assertBoardEquals(this.game, Tetris.CoordSet.createWith([[1,3]]));
+    },
+
+    "A piece should stay within the left and right boundaries of the board": function() {
+	this.game.start();
+
+	var that = this;
+	Tetris.Helper.times(3, function() { that.game.left(); });
+	assertBoardEquals(this.game, Tetris.CoordSet.createWith([[0,0]]));
+
+	this.game.left();
+	assertBoardEquals(this.game, Tetris.CoordSet.createWith([[0,0]]));
+
+	Tetris.Helper.times(Tetris.Game.ColCount, function() { that.game.right(); });
+	assertBoardEquals(this.game, Tetris.CoordSet.createWith([[0,Tetris.Game.MaxCol]]));
+
+	this.game.right();
+	assertBoardEquals(this.game, Tetris.CoordSet.createWith([[0,Tetris.Game.MaxCol]]));
+    },
+
+    "A piece should not go further down the bottom line of the board": function() {
+	this.game.start();
+
+	var that = this;
+	Tetris.Helper.times(Tetris.Game.RowCount, function() { that.game.down(); });
+	assertBoardEquals(this.game, Tetris.CoordSet.createWith([[Tetris.Game.MaxRow,3]]));
+
+	game.down();
+	assertBoardEquals(this.game, Tetris.CoordSet.createWith([[Tetris.Game.MaxRow,3]]));
+    },
+
+    "When a piece reaches the bottom, it should stay there and a new piece should appear": function() {
+	game.start();
+
+	var that = this;
+	Tetris.Helper.times(Tetris.Game.MaxRow, function() { that.game.tick(); });
+	assertBoardEquals(this.game, Tetris.CoordSet.createWith([[Tetris.Game.MaxRow, 3]]));
+
+	game.tick();
+	assertBoardEquals(this.game, Tetris.CoordSet.createWith([[0,3],[Tetris.Game.MaxRow, 3]]));
+    },
+    "When a piece is blocked by another one, it should stay there": function() {
+	game.start();
+
+	var that = this;
+	Tetris.Helper.times(Tetris.Game.MaxRow, function() { that.game.tick(); });
+	this.game.tick();
+	Tetris.Helper.times(Tetris.Game.RowCount-2, function() { that.game.tick(); });
+	assertBoardEquals(this.game, Tetris.CoordSet.createWith([[Tetris.Game.RowCount-2, 3],[Tetris.Game.MaxRow, 3]]));
+    },
+
+    "A piece should not be placed on a filled cells from the right or the left": function() {
+	game.start();
+
+	var that = this;
+	Tetris.Helper.times(Tetris.Game.MaxRow, function() { that.game.tick(); });
+
+	this.game.tick();
+	this.game.right();
+	Tetris.Helper.times(Tetris.Game.MaxRow, function() { that.game.down(); });
+	this.game.left();
+	assertBoardEquals(this.game, Tetris.CoordSet.createWith([[Tetris.Game.MaxRow, 3],[Tetris.Game.MaxRow, 4]]));
+
+	this.game.tick();
+	this.game.left();
+	Tetris.Helper.times(Tetris.Game.MaxRow, function() { that.game.down(); });
+	this.game.right();
+	assertBoardEquals(this.game, Tetris.CoordSet.createWith([[Tetris.Game.MaxRow, 2],[Tetris.Game.MaxRow, 3],[Tetris.Game.MaxRow, 4]]));
+    },
+
+    "When a line is filled, it should disappear": function() {
+	var that = this;
+
+	game.start();
+
+	game.setFilledCells(Tetris.CoordSet.createWithX(Tetris.Game.MaxRow, Tetris.Arrays.range(0, Tetris.Game.MaxCol - 1)).add(Tetris.Game.MaxRow - 1, 2));
+	Tetris.Helper.times(Tetris.Game.ColCount, function() { that.game.right(); });
+	Tetris.Helper.times(Tetris.Game.RowCount, function() { that.game.down(); });
+
+	assertBoardEquals(this.game, Tetris.CoordSet.createWithX(Tetris.Game.MaxRow, Tetris.Arrays.range(0, Tetris.Game.MaxCol)).add(Tetris.Game.MaxRow - 1, 2));
+	
+	game.tick();
+	assertBoardEquals(this.game, Tetris.CoordSet.createWith([[0, 3], [Tetris.Game.MaxRow, 2]]));
+    },
+
+    "Filled lines should be counted": function() {
+	var that = this;
+
+	game.start();
+	game.get('lineCount').shouldEqual(0);
+
+	game.setFilledCells(Tetris.CoordSet.createWithX(Tetris.Game.MaxRow, Tetris.Arrays.range(0, Tetris.Game.MaxCol - 1)).add(Tetris.Game.MaxRow - 1, 2));
+	Tetris.Helper.times(Tetris.Game.ColCount, function() { that.game.right(); });
+	Tetris.Helper.times(Tetris.Game.RowCount, function() { that.game.down(); });
+
+	game.tick();
+	game.get('lineCount').shouldEqual(1);
+    },
+
+    "The game should terminate when there is no more place left for new pieces": function() {
+	var that = this;
+
+	game.start();
+	game.setFilledCells(Tetris.CoordSet.createWith([[0, 3]]));
+	Tetris.Helper.times(Tetris.Game.RowCount, function() { that.game.down(); });
+
+	game.tick();
+	assertIdentical(false, game.get('playing'));
+    },
+
+    "If a piece fills many rows, they should all disappear": function() {
+	var that = this;
+
+	game.setPieceFactory(Tetris.SquarePiece);
+	game.start();
+	game.setFilledCells(Tetris.CoordSet.createWithXY([Tetris.Game.MaxRow - 1, Tetris.Game.MaxRow], Tetris.Arrays.range(0, Tetris.Game.MaxCol - 2)));
+	Tetris.Helper.times(Tetris.Game.MaxCol, function() {that.game.right(); });
+	Tetris.Helper.times(Tetris.Game.MaxRow, function() {that.game.down(); });
+	assertBoardEquals(game, Tetris.CoordSet.createWithXY([Tetris.Game.MaxRow - 1, Tetris.Game.MaxRow], Tetris.Arrays.range(0, Tetris.Game.MaxCol)));
+	
+	game.tick();
+	assertBoardEquals(game, Tetris.CoordSet.createWithXY([0,1], [3, 4]));
+    },
+
+    "It should be possible to rotate a piece": function() {
+	var that = this;
+
+	game.setPieceFactory(Tetris.IPiece);
+	game.start();
+	assertBoardEquals(game, Tetris.CoordSet.createWithXY(Tetris.Arrays.range(0, 3), [3]));
+
+	game.rotate();
+	Tetris.Helper.times(Tetris.Game.MaxCol, function() {that.game.left(); });
+	Tetris.Helper.times(Tetris.Game.MaxRow, function() {that.game.down(); });
+	assertBoardEquals(game, Tetris.CoordSet.createWithX(Tetris.Game.MaxRow, Tetris.Arrays.range(0, 3)));
+    },
+
+/*
+  tests :
+    Essayer de refactorer un peu les tests pour supprimer du code :
+       utiliser des setFilledCells
+       exporter les start pos des pieces dans piece.js
+
+  bugs:
+    Si on appuie plusieurs fois sur start, ça fait plusieurs tickers et ça accelère le jeu
+
+  options :
+     compter un score
+     passer des niveaux de difficulté
+     choisir son niveau au démarrage
+     afficher la prochaine piece
+     utiliser des couleurs différentes
+     afficher un game status plus explicite que playing true / false
+     faire un clignotement lorsqu'on supprime des lignes
+     afficher la pièce qui termine le jeu, actuellement, on voit pas trop pourquoi le jeux se termine.
+
+  ihm :
+     comment disposer le jeu un peu mieux,
+     le controller semble ne servir à rien ... normal ?
+*/
+});
+
+	     if (window.main && (appMain = main)) main = null ;
+
+	     </script>
+
+	     <% end %>
