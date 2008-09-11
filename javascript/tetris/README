@@ -11,7 +11,7 @@ sc-server
 This takes all the same arguments as mongrel.  You can now visit your app
 by going to:
 
-http://localhost:4020/app
+http://localhost:4020/tetris
 
 == What Goes Where
 
