@@ -1,0 +1,2 @@
+{packages,[]}.
+{modules,[bict,chat,client,gui,room,utils]}.

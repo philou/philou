@@ -1,0 +1,2 @@
+{packages,[]}.
+{modules,[colors,image,polynoms,raytracer,raytracer_impl,vectors]}.

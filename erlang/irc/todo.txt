@@ -1,0 +1,19 @@
+garder les pseudos dans la room - done
+ajouter un serveur, et plusieurs rooms - done
+faire fonctionner le serveur sur un noeud erlang distant - done
+refactorer / documenter le code, regarder edoc - done
+
+regarder comment tester automatiquement
+regarder dans le livre, qui envoie l'acknowledge ... room ou chat ?
+gérer le cas où le nickname existe déjà
+      - documentrer les codes d'erreur,
+      - debugger
+      - refactorer, trouver un moyen d'appeler une fonction avec retour d'exception inter process
+gérer les problêmes de connections
+essayer de se connecter plusieurs fois avant d'échouer
+ajouter un écran de connection
+ajouter la liste des rooms dans l'écran de connection
+ajouter la liste des utilisateurs dans l'écran de chat
+ajouter la possibilité de faire un dialogue privé
+utiliser lib_chan
+utiliser tcp/ip
