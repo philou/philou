@@ -1,31 +1,35 @@
 #include <assert.h>
 
-// For our specific problem, we could optimize it as following: 
-// we know that the array was sorted, so once we found a minimum,
-// we know we have found the result.
-// On the other hand, this function is more general and might be usable
-// in other contexts.
-int IndexOfFirstMinimum(int array[], unsigned length)
+/*
+
+Before the rotation, the values in the array were always
+increasing. This should not change in the rotated array,
+appart when going from what was the last index to what
+was the first index.
+So to find the amount of rotation, we just have to found 
+the first index which has a value smaller than the
+previous index.
+
+This solution runs in linear time, O(n) and constant
+space O(1).
+
+*/
+int FindFirstDecreasingIndex(int array[], unsigned length)
 {
   if (0 == length)
     return 0;
 
-  int minimum = array[0];
-  int result = 0;
-  for (int i = 1; i < length; ++i)
+  for (unsigned int i = 1; i < length; ++i)
     {
-      if (array[i] < minimum)
-	{
-	  minimum = array[i];
-	  result = i;
-	}
+      if (array[i-1] > array[i])
+	return i;
     }
-  return result;
+  return 0;
 }
 
 int FindSortedArrayRotation( int array[], unsigned length )
 {
-  return IndexOfFirstMinimum(array, length);
+  return FindFirstDecreasingIndex(int array[], unsigned length);
 }
 
 int main(int argc, char** args)
@@ -47,6 +51,9 @@ int main(int argc, char** args)
 
   int twoMinimumsArray[] = {4, 0, 0, 2, 3};
   assert(1 == FindSortedArrayRotation(twoMinimumsArray, sizeof(twoMinimumsArray)/sizeof(*twoMinimumsArray)));
+
+  int twoMinimumsAtExtremitiesArray[] = {0, 2, 3, 4, 0};
+  assert(4 == FindSortedArrayRotation(twoMinimumsAtExtremitiesArray, sizeof(twoMinimumsAtExtremitiesArray)/sizeof(*twoMinimumsAtExtremitiesArray)));
 
   return 0;
 }

@@ -47,6 +47,29 @@ unsigned int PreviousIndexWithColor( Ball aBalls[], unsigned int cBalls, unsigne
   return i;
 }
 
+/*
+The idea in this algorithm is to start from both ends of the array.
+The color of the first ball is selected as the color to pack at the begining.
+Iterating from both ends, the first ball that is not of the begining color is swaped
+with the last ball that is of the begining color.
+When both cursors meet, we know the array was partitioned.
+
+The algorithm runs in linear time O(n) and constant place O(1).
+
+When applied as is to an array with more than 3 colors, the algorithm will simply
+pack the first color at the begining, and leave the rest unsorted ... Recusively
+applying the algorithm to the rest of the array before returning would allow to
+solve the problem.
+This modification would run in O(cn) time where c is the number of colors and in
+O(c) in space, due to recursive calls.
+
+Another way would be to define an order on Balls according to their colors, and
+applying a classical sort algorithm. This could run in O(nlog(n)) in both space
+and time, and might be or not a better choice depending on the context of execution,
+and the number of colors in particular.
+
+*/
+
 unsigned Partition( Ball aBalls[], unsigned cBalls )
 {
   assert(aBalls);
@@ -97,16 +120,3 @@ int main(int argc, char** args)
   return 0;
 }
 
-/*
-
-With three colors, I could modify my algorithm to first pack one of the colors at the begining of the array.
-And then, recurse and perform a 2 colors partition on the remaining elements.
-
-With 9 colors, I would use the stl or another library to quicksort the Balls in the array according to their colors.
-
-int operator<(const Ball& a, const Ball& b)
-{
-  return a.Color() < b.Color();
-}
-
-*/
