@@ -103,7 +103,7 @@ unsigned Partition( Ball aBalls[], unsigned cBalls )
 
 int main(int argc, char** args)
 {
-  Ball emptyArray[] = {};
+  Ball emptyArray[0];
   assert(0 == Partition(emptyArray, 0));
 
   Ball oneElementArray[] = { Ball(Ball::RED) };

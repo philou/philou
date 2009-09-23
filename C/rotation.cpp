@@ -16,6 +16,8 @@ space O(1).
 */
 int FindFirstDecreasingIndex(int array[], unsigned length)
 {
+  assert(array);
+
   if (0 == length)
     return 0;
 
@@ -29,7 +31,9 @@ int FindFirstDecreasingIndex(int array[], unsigned length)
 
 int FindSortedArrayRotation( int array[], unsigned length )
 {
-  return FindFirstDecreasingIndex(int array[], unsigned length);
+  assert(array);
+
+  return FindFirstDecreasingIndex(array, length);
 }
 
 int main(int argc, char** args)
