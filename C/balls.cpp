@@ -88,7 +88,11 @@ unsigned Partition( Ball aBalls[], unsigned cBalls )
 
       right = PreviousIndexWithColor(aBalls, cBalls, right, leftColor);
       if (right <= left)
+      {
+        // Line to add to handle multiple colors:
+        // Partition(aBalls+left, cBalls-left);
 	return left;
+      }
 
       Swap(aBalls, left, right);
 
