@@ -27,7 +27,9 @@ Todos.mainPage = SC.Page.design({
 
       addButton: SC.ButtonView.design({
 	layout: { centerY: 0, height: 24, right: 12, width: 100 },
-	title: 'Add Task'
+	title: 'Add Task',
+	target: 'Todos.tasksController',
+	action: 'addTask'
       })
     }),
 
@@ -35,7 +37,17 @@ Todos.mainPage = SC.Page.design({
       hasHorizontalScroller: NO,
       layout: { top: 36, bottom: 12, left: 0, right: 0 },
       backgroundCoor: 'white',
-      contentView: SC.ListView.design({})
+      contentView: SC.ListView.design({
+	contentBinding: 'Todos.tasksController.arrangedObjects',
+	selectionBinding: 'Todos.tasksController.selection',
+	contentValueKey: 'description',
+	contentCheckboxKey: 'isDone',
+	rowHeight: 21,
+	canEditContent: YES,
+	canDeleteContent: YES,
+	target: 'Todos.tasksController',
+	action: 'toggleDone'
+      })
     }),
 
     bottomView: SC.ToolbarView.design({
@@ -46,7 +58,7 @@ Todos.mainPage = SC.Page.design({
       summaryView: SC.LabelView.design({
 	layout: { centerY: 0, height: 18, left: 20, right: 20 },
 	textAlign: SC.ALIGN_CENTER,
-	value: 'Item Count'
+	valueBinding: 'Todos.tasksController.summary'
       })
     })
   })

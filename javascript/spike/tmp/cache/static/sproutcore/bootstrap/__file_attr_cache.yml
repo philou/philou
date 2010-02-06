@@ -1,0 +1,23 @@
+--- 
+/usr/lib/ruby/gems/1.8/gems/sproutcore-1.0.1037/frameworks/sproutcore/frameworks/bootstrap/system/loader.js: 
+  scan_source: 
+    mtime: 1259358102
+    value: []
+
+/usr/lib/ruby/gems/1.8/gems/sproutcore-1.0.1037/frameworks/sproutcore/frameworks/bootstrap/core.js: 
+  scan_source: 
+    mtime: 1259358102
+    value: []
+
+/usr/lib/ruby/gems/1.8/gems/sproutcore-1.0.1037/frameworks/sproutcore/frameworks/bootstrap/setup_body_class_names.js: 
+  scan_source: 
+    mtime: 1259358102
+    value: 
+    - - sc_resource
+      - "'"
+      - setup_body_class_names
+/usr/lib/ruby/gems/1.8/gems/sproutcore-1.0.1037/frameworks/sproutcore/frameworks/bootstrap/system/browser.js: 
+  scan_source: 
+    mtime: 1259358102
+    value: []
+

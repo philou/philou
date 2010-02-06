@@ -15,8 +15,8 @@ Todos.main = function main() {
 
   // Step 1: Instantiate Your Views
   // The default code here will make the mainPane for your application visible
-  // on screen.  If you app gets any level of complexity, you will probably 
-  // create multiple pages and panes.  
+  // on screen.  If you app gets any level of complexity, you will probably
+  // create multiple pages and panes.
   Todos.getPath('mainPage.mainPane').append() ;
 
   // Step 2. Set the content property on your primary controller.
@@ -24,6 +24,10 @@ Todos.main = function main() {
 
   // TODO: Set the content property on your primary controller
   // ex: Todos.contactsController.set('content',Todos.contacts);
+
+  var query = SC.Query.local(Todos.Task, { orderBy: 'isDone,Description'} );
+  var tasks = Todos.store.find(query);
+  Todos.tasksController.set('content', tasks);
 
 } ;
 
