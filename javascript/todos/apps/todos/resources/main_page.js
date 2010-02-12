@@ -30,6 +30,7 @@ Todos.mainPage = SC.Page.design({
 	title: 'Add Task',
 	target: 'Todos.tasksController',
 	action: 'addTask'
+main_page.js
       })
     }),
 
